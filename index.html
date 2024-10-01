@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TikTok Downloader</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-gray-200">
+    <div class="container mx-auto px-4 py-12">
+      <h1 class="text-5xl font-extrabold text-center mb-12 text-white">
+        TikTok Downloader
+      </h1>
+      <div class="max-w-xl mx-auto bg-gray-800 p-10 rounded-lg shadow-lg">
+        <form id="download-form" class="space-y-6">
+          <div>
+            <label for="url" class="block text-sm font-medium text-gray-400"
+              >TikTok URL</label
+            >
+            <input
+              type="url"
+              id="url"
+              name="url"
+              required
+              class="mt-2 block w-full p-3 border border-gray-600 rounded bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="https://www.tiktok.com/@username/video/1234567890"
+            />
+          </div>
+          <div class="flex justify-center">
+            <button
+              type="submit"
+              class="bg-blue-600 text-white py-3 px-6 rounded-full font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Download
+            </button>
+          </div>
+        </form>
+        <div id="result" class="mt-8 hidden">
+          <h2 class="text-3xl font-bold mb-6 text-center">Your Downloads</h2>
+          <div class="flex flex-col space-y-4">
+            <a
+              id="video-link"
+              href="#"
+              target="_blank"
+              class="bg-green-600 hover:bg-green-700 py-3 px-6 rounded-full text-center font-semibold text-white transition-colors"
+              >Download Video</a
+            >
+            <a
+              id="music-link"
+              href="#"
+              target="_blank"
+              class="bg-green-600 hover:bg-green-700 py-3 px-6 rounded-full text-center font-semibold text-white transition-colors"
+              >Download Music</a
+            >
+            <video
+              id="video-result"
+              controls
+              class="w-full mt-6 rounded-lg hidden"
+            ></video>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("download-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const url = document.getElementById("url").value;
+
+          fetch(
+            `https://api.tiklydown.eu.org/api/download/v3?url=${encodeURIComponent(
+              url
+            )}`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === 200) {
+                const result = data.result;
+                document.getElementById("video-link").href = result.video;
+                document.getElementById("music-link").href = result.music;
+
+                const videoResult = document.getElementById("video-result");
+                videoResult.src = result.video;
+                videoResult.classList.remove("hidden");
+
+                document.getElementById("result").classList.remove("hidden");
+              } else {
+                alert(
+                  "Failed to fetch download links. Please check the URL and try again."
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred. Please try again.");
+            });
+        });
+    </script>
+  </body>
+</html>
